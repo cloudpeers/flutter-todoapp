@@ -1,4 +1,4 @@
-package com.example.todoapp2
+package com.cloudpeer.flutter_todoapp
 
 import io.flutter.embedding.android.FlutterActivity
 

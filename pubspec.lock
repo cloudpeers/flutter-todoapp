@@ -222,7 +222,7 @@ packages:
   tlfs:
     dependency: transitive
     description:
-      path: "../tlfs/dart"
+      path: "../tlfs/api/dart"
       relative: true
     source: path
     version: "0.1.0"
