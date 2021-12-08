@@ -8,8 +8,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_tlfs:
-    path: ../flutter_tlfs
+  tlfs:
+    path: ../tlfs/api/dart
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tlfs/flutter_tlfs.dart';
+import 'package:tlfs/sdk.dart';
 import './state.dart';
 
 void main() {
@@ -7,55 +7,51 @@ void main() {
     Sdk(
       appname: 'todoapp',
       child: MaterialApp(
-        initialRoute: '/docs',
-        onGenerateRoute: (settings) {
-          switch (settings.name) {
-            case '/docs':
-              return MaterialPageRoute(
-                builder: (context) {
-                  return DocsView();
-                }
-              );
-            case '/todos':
-              final todos = settings.arguments! as Todos;
-              return MaterialPageRoute(
-                builder: (context) {
+          initialRoute: '/docs',
+          onGenerateRoute: (settings) {
+            switch (settings.name) {
+              case '/docs':
+                return MaterialPageRoute(builder: (context) {
+                  final sdk = Sdk.of(context).sdk;
+                  final docs = Docs.load(sdk, "todoapp");
+                  return DocsView(docs: docs);
+                });
+              case '/todos':
+                final todos = settings.arguments! as Todos;
+                return MaterialPageRoute(builder: (context) {
                   return TodosView(todos: todos);
-                }
-              );
-            default:
-              return null;
-          }
-        }
-      ),
+                });
+              default:
+                return null;
+            }
+          }),
     ),
   );
 }
 
 class DocsView extends StatelessWidget {
+  const DocsView({
+    Key? key,
+    required this.docs,
+  }) : super(key: key);
+
+  final Docs docs;
+
   @override
   Widget build(BuildContext context) {
-    return Docs(
-      schema: 'todoapp',
-      child: Builder(
-        builder: (context) {
-          final docs = Docs.of(context);
-          return Scaffold(
-            appBar: AppBar(title: Text('Documents')),
-            body: ListView.builder(
-              itemCount: docs.length(),
-              itemBuilder: (context, i) {
-                return DocTile(todos: Todos(docs.get(i)));
-              },
-            ),
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                final doc = docs.create();
-                Todos(doc).setTitle('a new document');
-              },
-            ),
-          );
+    return Scaffold(
+      appBar: AppBar(title: const Text('Documents')),
+      body: ListView.builder(
+        itemCount: docs.length(),
+        itemBuilder: (context, i) {
+          return DocTile(todos: Todos(docs.get(i)));
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          final doc = docs.create();
+          Todos(doc).setTitle('a new document');
         },
       ),
     );
@@ -74,16 +70,21 @@ class TodosView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Title(values: todos.title())),
-      body: ListView.builder(
-        itemCount: todos.length(),
-        itemBuilder: (context, i) {
-          return TodoTile(todo: this.todos.get(i));
+      body: StreamBuilder(
+        stream: todos.subscribe(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          return ListView.builder(
+            itemCount: todos.length(),
+            itemBuilder: (context, i) {
+              return TodoTile(todo: todos.get(i));
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
-          this.todos.create('a new todo');
+          todos.create('a new todo');
         },
       ),
     );
@@ -102,14 +103,14 @@ class DocTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Title(values: this.todos.title()),
-        subtitle: Text(this.todos.id()),
+        title: Title(values: todos.title()),
+        subtitle: Text(todos.id()),
         onTap: () {
-          Navigator.pushNamed(context, '/todos', arguments: this.todos);
+          Navigator.pushNamed(context, '/todos', arguments: todos);
         },
         onLongPress: () {
           final sdk = Sdk.of(context).sdk;
-          sdk.removeDoc(this.todos.doc.id()); // safety
+          sdk.removeDoc(todos.doc.id()); // safety
         },
       ),
     );
@@ -128,19 +129,18 @@ class TodoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Title(values: this.todo.title()),
-        trailing: Checkbox(
-          value: this.todo.complete(),
-          onChanged: (value) {
-            if (value != null) {
-              this.todo.setComplete(value);
-            }
-          },
-        ),
-        onTap: () {
-          // edit title and delete
-        }
-      ),
+          title: Title(values: todo.title()),
+          trailing: Checkbox(
+            value: todo.complete(),
+            onChanged: (value) {
+              if (value != null) {
+                todo.setComplete(value);
+              }
+            },
+          ),
+          onTap: () {
+            // edit title and delete
+          }),
     );
   }
 }
@@ -156,12 +156,11 @@ class Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = [];
-    print(this.values);
-    if (this.values.length > 0) {
-      children.add(Text(this.values[0]));
+    if (values.isNotEmpty) {
+      children.add(Text(values[0]));
     }
-    if (this.values.length > 1) {
-      children.add(Icon(Icons.warning));
+    if (values.length > 1) {
+      children.add(const Icon(Icons.warning));
     }
     return Row(children: children);
   }

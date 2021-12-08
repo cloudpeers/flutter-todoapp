@@ -7,57 +7,55 @@ class Todo {
   Todo(this.doc, this.index);
 
   List<String> title() {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    cursor.index(this.index);
-    cursor.field("title");
-    final iter = cursor.strs();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    cursor.arrayIndex(index);
+    cursor.structField("title");
     final List<String> titles = [];
-    for (final title in iter) {
+    for (final title in cursor.regStrs()) {
       titles.add(title);
     }
-    iter.destroy();
-    cursor.destroy();
+    cursor.drop();
     return titles;
   }
 
   bool complete() {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    cursor.index(this.index);
-    cursor.field("complete");
-    final completed = cursor.enabled();
-    cursor.destroy();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    cursor.arrayIndex(index);
+    cursor.structField("complete");
+    final completed = cursor.flagEnabled();
+    cursor.drop();
     return completed;
   }
 
   void setTitle(String title) {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    cursor.index(this.index);
-    cursor.field("title");
-    final causal = cursor.assignStr(title);
-    this.doc.apply(causal);
-    cursor.destroy();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    cursor.arrayIndex(index);
+    cursor.structField("title");
+    final causal = cursor.regAssignStr(title);
+    doc.applyCausal(causal);
+    cursor.drop();
   }
 
   void setComplete(bool complete) {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    cursor.index(this.index);
-    cursor.field("complete");
-    final causal = complete ? cursor.enable() : cursor.disable();
-    this.doc.apply(causal);
-    cursor.destroy();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    cursor.arrayIndex(index);
+    cursor.structField("complete");
+    final causal = complete ? cursor.flagEnable() : cursor.flagDisable();
+    doc.applyCausal(causal);
+    cursor.drop();
   }
 
   void delete() {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    cursor.index(this.index);
-    final causal = cursor.delete();
-    this.doc.apply(causal);
-    cursor.destroy();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    cursor.arrayIndex(index);
+    final causal = cursor.arrayRemove();
+    doc.applyCausal(causal);
+    cursor.drop();
   }
 }
 
@@ -67,47 +65,82 @@ class Todos {
   Todos(this.doc);
 
   String id() {
-    return this.doc.id().toString();
+    return doc.id().toString();
+  }
+
+  Stream<void> subscribe() {
+    final cursor = doc.createCursor();
+    final stream = cursor.subscribe();
+    cursor.drop();
+    return stream;
   }
 
   List<String> title() {
-    final cursor = this.doc.cursor();
-    cursor.field("title");
-    final iter = cursor.strs();
+    final cursor = doc.createCursor();
+    cursor.structField("title");
     final List<String> titles = [];
-    for (final title in iter) {
+    for (final title in cursor.regStrs()) {
       titles.add(title);
     }
-    iter.destroy();
-    cursor.destroy();
+    cursor.drop();
     return titles;
   }
 
   void setTitle(String title) {
-    final cursor = this.doc.cursor();
-    cursor.field("title");
-    final causal = cursor.assignStr(title);
-    this.doc.apply(causal);
-    cursor.destroy();
+    final cursor = doc.createCursor();
+    cursor.structField("title");
+    final causal = cursor.regAssignStr(title);
+    doc.applyCausal(causal);
+    cursor.drop();
   }
 
   int length() {
-    final cursor = this.doc.cursor();
-    cursor.field("tasks");
-    return cursor.length();
+    final cursor = doc.createCursor();
+    cursor.structField("tasks");
+    final length = cursor.arrayLength();
+    cursor.drop();
+    return length;
   }
 
   Todo create(String title) {
-    final todo = Todo(this.doc, this.length());
+    final todo = Todo(doc, length());
     todo.setTitle(title);
     return todo;
   }
 
   Todo get(int index) {
-    return Todo(this.doc, index);
+    return Todo(doc, index);
   }
 
   void remove(int index) {
-    this.get(index).delete();
+    get(index).delete();
+  }
+}
+
+class Docs {
+  final tlfs.Sdk sdk;
+  final String schema;
+  final List<String> docs;
+
+  Docs._(this.sdk, this.schema, this.docs);
+
+  static Docs load(tlfs.Sdk sdk, String schema) {
+    final List<String> docs = [];
+    for (final doc in sdk.docs(schema)) {
+      docs.add(doc);
+    }
+    return Docs._(sdk, schema, docs);
+  }
+
+  tlfs.Doc create() {
+    return sdk.createDoc(schema);
+  }
+
+  tlfs.Doc get(int index) {
+    return sdk.openDoc(docs[index]);
+  }
+
+  int length() {
+    return docs.length;
   }
 }
