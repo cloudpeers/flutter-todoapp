@@ -30,8 +30,12 @@ void download(Artefact artefact, Target target, String out) async {
     workingDirectory: out);
   stdout.write(result.stdout);
   stderr.write(result.stderr);
+  var tar = 'tar';
+  if (Platform.isMacOS) {
+    tar = 'gtar';
+  }
   final result2 = await Process.run(
-    'tar', ['--zstd', '-xf', asset],
+    tar, ['--zstd', '-xf', asset],
     workingDirectory: out);
   stdout.write(result2.stdout);
   stderr.write(result2.stderr);
