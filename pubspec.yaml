@@ -20,3 +20,5 @@ flutter:
   uses-material-design: true
   assets:
   - assets/todoapp.tlfs.rkyv
+  tlfs-ios:
+    path: ios/tlfs
