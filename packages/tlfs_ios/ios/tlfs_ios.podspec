@@ -3,8 +3,8 @@
 # Run `pod lib lint tlfs.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'tlfs'
-  s.version          = '0.0.1'
+  s.name             = 'tlfs_ios'
+  s.version          = '0.1.0'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
