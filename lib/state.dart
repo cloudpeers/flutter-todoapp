@@ -132,8 +132,8 @@ class Docs {
     return Docs._(sdk, schema, docs);
   }
 
-  tlfs.Doc create() {
-    return sdk.createDoc(schema);
+  Future<tlfs.Doc> create() async {
+    return await sdk.createDoc(schema);
   }
 
   tlfs.Doc get(int index) {

@@ -7,7 +7,7 @@
 To update tlfs or tlfsc run
 
 ```sh
-dart run bin/download_tlfs.dart
+dart run tlfs:download_tlfs
 ```
 
 ## Build schema
@@ -16,7 +16,7 @@ Whenever the schema is changed in `assets/todoapp.tlfs`, it needs to be recompil
 the `bin/build_schema.dart` script.
 
 ```sh
-dart run bin/build_schema.dart
+dart run tlfs:build_schema
 ```
 
 ## Add compiled schema as an asset

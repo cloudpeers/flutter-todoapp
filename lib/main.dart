@@ -49,8 +49,8 @@ class DocsView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {
-          final doc = docs.create();
+        onPressed: () async {
+          final doc = await docs.create();
           Todos(doc).setTitle('a new document');
         },
       ),
