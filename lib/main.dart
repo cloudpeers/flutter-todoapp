@@ -1,5 +1,7 @@
+import 'package:flip/flip.dart';
 import 'package:flutter/material.dart';
 import 'package:tlfs/sdk.dart';
+import 'package:tlfs/tlfs.dart' as tlfs;
 import './state.dart';
 
 void main() {
@@ -13,8 +15,7 @@ void main() {
               case '/docs':
                 return MaterialPageRoute(builder: (context) {
                   final sdk = Sdk.of(context).sdk;
-                  final docs = Docs.load(sdk, "todoapp");
-                  return DocsView(docs: docs);
+                  return DocsView(sdk: sdk, schema: "todoapp");
                 });
               case '/todos':
                 final todos = settings.arguments! as Todos;
@@ -32,25 +33,37 @@ void main() {
 class DocsView extends StatelessWidget {
   const DocsView({
     Key? key,
-    required this.docs,
+    required this.sdk,
+    required this.schema,
   }) : super(key: key);
 
-  final Docs docs;
+  final tlfs.Sdk sdk;
+  final String schema;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Documents')),
-      body: ListView.builder(
-        itemCount: docs.length(),
-        itemBuilder: (context, i) {
-          return DocTile(todos: Todos(docs.get(i)));
+      body: StreamBuilder(
+        stream: sdk.subscribeDocs(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          final docs = sdk.docs(schema).toList();
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, i) {
+              final todos = Todos(sdk.openDoc(docs[i]));
+              return StreamBuilder(
+                stream: todos.subscribeTitle(),
+                builder: (context, snapshot) => DocTile(todos: todos),
+              );
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
-          final doc = await docs.create();
+          final doc = await sdk.createDoc(schema);
           Todos(doc).setTitle('a new document');
         },
       ),
@@ -91,7 +104,7 @@ class TodosView extends StatelessWidget {
   }
 }
 
-class DocTile extends StatelessWidget {
+class DocTile extends StatefulWidget {
   const DocTile({
     Key? key,
     required this.todos,
@@ -100,24 +113,79 @@ class DocTile extends StatelessWidget {
   final Todos todos;
 
   @override
+  State<DocTile> createState() => _DocTileState();
+}
+
+class _DocTileState extends State<DocTile> {
+  late TextEditingController _titleController;
+  late FlipController _flipController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.todos.title()[0]);
+    _flipController = FlipController();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _flipController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Title(values: todos.title()),
-        subtitle: Text(todos.id()),
-        onTap: () {
-          Navigator.pushNamed(context, '/todos', arguments: todos);
-        },
-        onLongPress: () {
+    return Dismissible(
+        key: GlobalKey(),
+        child: Flip(
+          controller: _flipController,
+          flipDirection: Axis.vertical,
+          firstChild: Card(
+            child: ListTile(
+              title: Title(values: widget.todos.title()),
+              subtitle: Text(widget.todos.id()),
+              onTap: () {
+                Navigator.pushNamed(context, '/todos', arguments: widget.todos);
+              },
+              onLongPress: () {
+                _flipController.flip();
+              },
+            ),
+          ),
+          secondChild: GestureDetector(
+            onLongPress: () {
+              _flipController.flip();
+            },
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                    .add(const EdgeInsets.only(bottom: 3.0)),
+                child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Title',
+                    ),
+                    controller: _titleController,
+                    onSubmitted: (String value) {
+                      widget.todos.setTitle(value);
+                      _flipController.flip();
+                    }),
+              ),
+            ),
+          ),
+        ),
+        background: Container(color: Colors.red),
+        onDismissed: (direction) {
           final sdk = Sdk.of(context).sdk;
-          sdk.removeDoc(todos.doc.id()); // safety
-        },
-      ),
-    );
+          final title = widget.todos.title()[0];
+          sdk.removeDoc(widget.todos.id());
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('removed document `$title`')));
+        });
   }
 }
 
-class TodoTile extends StatelessWidget {
+class TodoTile extends StatefulWidget {
   const TodoTile({
     Key? key,
     required this.todo,
@@ -126,22 +194,79 @@ class TodoTile extends StatelessWidget {
   final Todo todo;
 
   @override
+  State<TodoTile> createState() => _TodoTileState();
+}
+
+class _TodoTileState extends State<TodoTile> {
+  late TextEditingController _titleController;
+  late FlipController _flipController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.todo.title()[0]);
+    _flipController = FlipController();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _flipController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-          title: Title(values: todo.title()),
-          trailing: Checkbox(
-            value: todo.complete(),
-            onChanged: (value) {
-              if (value != null) {
-                todo.setComplete(value);
-              }
-            },
+    return Dismissible(
+        key: GlobalKey(),
+        child: Flip(
+          controller: _flipController,
+          flipDirection: Axis.vertical,
+          flipDuration: const Duration(milliseconds: 300),
+          firstChild: Card(
+            child: ListTile(
+              title: Title(values: widget.todo.title()),
+              trailing: Checkbox(
+                value: widget.todo.complete(),
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.todo.setComplete(value);
+                  }
+                },
+              ),
+              onLongPress: () {
+                _flipController.flip();
+              },
+            ),
           ),
-          onTap: () {
-            // edit title and delete
-          }),
-    );
+          secondChild: GestureDetector(
+            onLongPress: () {
+              _flipController.flip();
+            },
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                    .add(const EdgeInsets.only(bottom: 3.0)),
+                child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Title',
+                    ),
+                    controller: _titleController,
+                    onSubmitted: (String value) {
+                      widget.todo.setTitle(value);
+                      _flipController.flip();
+                    }),
+              ),
+            ),
+          ),
+        ),
+        background: Container(color: Colors.red),
+        onDismissed: (direction) {
+          final title = widget.todo.title()[0];
+          widget.todo.delete();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('removed todo `$title`')));
+        });
   }
 }
 

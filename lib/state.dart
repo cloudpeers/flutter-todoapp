@@ -11,10 +11,7 @@ class Todo {
     cursor.structField("tasks");
     cursor.arrayIndex(index);
     cursor.structField("title");
-    final List<String> titles = [];
-    for (final title in cursor.regStrs()) {
-      titles.add(title);
-    }
+    final titles = cursor.regStrs().toList();
     cursor.drop();
     return titles;
   }
@@ -78,10 +75,7 @@ class Todos {
   List<String> title() {
     final cursor = doc.createCursor();
     cursor.structField("title");
-    final List<String> titles = [];
-    for (final title in cursor.regStrs()) {
-      titles.add(title);
-    }
+    final titles = cursor.regStrs().toList();
     cursor.drop();
     return titles;
   }
@@ -92,6 +86,14 @@ class Todos {
     final causal = cursor.regAssignStr(title);
     doc.applyCausal(causal);
     cursor.drop();
+  }
+
+  Stream<void> subscribeTitle() {
+    final cursor = doc.createCursor();
+    cursor.structField("title");
+    final stream = cursor.subscribe();
+    cursor.drop();
+    return stream;
   }
 
   int length() {
@@ -114,33 +116,5 @@ class Todos {
 
   void remove(int index) {
     get(index).delete();
-  }
-}
-
-class Docs {
-  final tlfs.Sdk sdk;
-  final String schema;
-  final List<String> docs;
-
-  Docs._(this.sdk, this.schema, this.docs);
-
-  static Docs load(tlfs.Sdk sdk, String schema) {
-    final List<String> docs = [];
-    for (final doc in sdk.docs(schema)) {
-      docs.add(doc);
-    }
-    return Docs._(sdk, schema, docs);
-  }
-
-  Future<tlfs.Doc> create() async {
-    return await sdk.createDoc(schema);
-  }
-
-  tlfs.Doc get(int index) {
-    return sdk.openDoc(docs[index]);
-  }
-
-  int length() {
-    return docs.length;
   }
 }
