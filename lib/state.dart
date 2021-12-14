@@ -118,3 +118,17 @@ class Todos {
     get(index).delete();
   }
 }
+
+class LocalPeers {
+  final tlfs.Sdk sdk;
+
+  LocalPeers(this.sdk);
+
+  Stream<List<String>> subscribeLocalPeers() async* {
+    final sub = sdk.subscribeLocalPeers();
+    yield (await sdk.localPeers()).toList();
+    await for (final _ in sub) {
+      yield (await sdk.localPeers()).toList();
+    }
+  }
+}

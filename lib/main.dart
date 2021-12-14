@@ -71,39 +71,6 @@ class DocsView extends StatelessWidget {
   }
 }
 
-class TodosView extends StatelessWidget {
-  const TodosView({
-    Key? key,
-    required this.todos,
-  }) : super(key: key);
-
-  final Todos todos;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Title(values: todos.title())),
-      body: StreamBuilder(
-        stream: todos.subscribe(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          return ListView.builder(
-            itemCount: todos.length(),
-            itemBuilder: (context, i) {
-              return TodoTile(todo: todos.get(i));
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          todos.create('a new todo');
-        },
-      ),
-    );
-  }
-}
-
 class DocTile extends StatefulWidget {
   const DocTile({
     Key? key,
@@ -182,6 +149,59 @@ class _DocTileState extends State<DocTile> {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('removed document `$title`')));
         });
+  }
+}
+
+class TodosView extends StatelessWidget {
+  const TodosView({
+    Key? key,
+    required this.todos,
+  }) : super(key: key);
+
+  final Todos todos;
+
+  @override
+  Widget build(BuildContext context) {
+    final sdk = Sdk.of(context).sdk;
+    return Scaffold(
+      appBar: AppBar(title: Title(values: todos.title())),
+      body: StreamBuilder(
+        stream: todos.subscribe(),
+        builder: (context, snapshot) {
+          return ListView.builder(
+            itemCount: todos.length(),
+            itemBuilder: (context, i) {
+              return TodoTile(todo: todos.get(i));
+            },
+          );
+        },
+      ),
+      drawer: Drawer(
+        child: StreamBuilder(
+          stream: LocalPeers(sdk).subscribeLocalPeers(),
+          builder: (context, AsyncSnapshot<List<String>> snapshot) {
+            if (snapshot.data == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final localPeers = snapshot.data!;
+            return ListView.builder(
+              itemCount: localPeers.length,
+              itemBuilder: (context, i) {
+                return ListTile(
+                  title: Text(localPeers[i]),
+                );
+              },
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          todos.create('a new todo');
+        },
+      ),
+    );
   }
 }
 
