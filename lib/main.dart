@@ -44,22 +44,27 @@ class DocsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Documents')),
-      body: StreamBuilder(
-        stream: sdk.subscribeDocs(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          final docs = sdk.docs(schema).toList();
-          return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, i) {
-              final todos = Todos(sdk.openDoc(docs[i]));
-              return StreamBuilder(
-                stream: todos.subscribeTitle(),
-                builder: (context, snapshot) => DocTile(todos: todos),
+      body: Column(children: [
+        const InviteBanner(),
+        Expanded(
+          child: StreamBuilder(
+            stream: sdk.subscribeDocs(),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              final docs = sdk.docs(schema).toList();
+              return ListView.builder(
+                itemCount: docs.length,
+                itemBuilder: (context, i) {
+                  final todos = Todos(sdk.openDoc(docs[i]));
+                  return StreamBuilder(
+                    stream: todos.subscribeTitle(),
+                    builder: (context, snapshot) => DocTile(todos: todos),
+                  );
+                },
               );
             },
-          );
-        },
-      ),
+          ),
+        ),
+      ]),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
@@ -90,7 +95,12 @@ class _DocTileState extends State<DocTile> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.todos.title()[0]);
+    final title = widget.todos.title();
+    String? text;
+    if (title.isNotEmpty) {
+      text = title[0];
+    }
+    _titleController = TextEditingController(text: text);
     _flipController = FlipController();
   }
 
@@ -165,16 +175,22 @@ class TodosView extends StatelessWidget {
     final sdk = Sdk.of(context).sdk;
     return Scaffold(
       appBar: AppBar(title: Title(values: todos.title())),
-      body: StreamBuilder(
-        stream: todos.subscribe(),
-        builder: (context, snapshot) {
-          return ListView.builder(
-            itemCount: todos.length(),
-            itemBuilder: (context, i) {
-              return TodoTile(todo: todos.get(i));
+      body: Column(
+        children: [
+          const InviteBanner(),
+          Expanded(
+              child: StreamBuilder(
+            stream: todos.subscribe(),
+            builder: (context, snapshot) {
+              return ListView.builder(
+                itemCount: todos.length(),
+                itemBuilder: (context, i) {
+                  return TodoTile(todo: todos.get(i));
+                },
+              );
             },
-          );
-        },
+          )),
+        ],
       ),
       drawer: Drawer(
         child: StreamRebuilder(
@@ -187,8 +203,14 @@ class TodosView extends StatelessWidget {
             return ListView.builder(
               itemCount: localPeers.length,
               itemBuilder: (context, i) {
-                return ListTile(
-                  title: Text(localPeers[i]),
+                return PeerTile(
+                  id: localPeers[i],
+                  isConnected: false,
+                  isLocal: true,
+                  permission: 0,
+                  onTap: () {
+                    todos.addPeer(localPeers[i]);
+                  },
                 );
               },
             );
@@ -200,6 +222,97 @@ class TodosView extends StatelessWidget {
         onPressed: () {
           todos.create('a new todo');
         },
+      ),
+    );
+  }
+}
+
+class InviteBanner extends StatefulWidget {
+  const InviteBanner({Key? key}) : super(key: key);
+
+  @override
+  State<InviteBanner> createState() => _InviteBannerState();
+}
+
+class _InviteBannerState extends State<InviteBanner> {
+  List<String> invites = [];
+
+  @override
+  Widget build(BuildContext context) {
+    final sdk = Sdk.of(context).sdk;
+    return StreamBuilder(
+        stream: Invites(sdk).subscribeInvites(),
+        builder: (context, AsyncSnapshot<List<String>> snapshot) {
+          if (snapshot.data != null) {
+            invites = snapshot.data!;
+          }
+          final List<Widget> children = [];
+          for (int i = 0; i < invites.length; i++) {
+            children.add(MaterialBanner(
+              padding: const EdgeInsets.all(20),
+              content: Text(
+                  'received an invitation to collaborate on ${invites[i]}'),
+              backgroundColor: const Color(0xFFE0E0E0),
+              actions: [
+                TextButton(
+                  child: const Text('ACCEPT'),
+                  onPressed: () {
+                    sdk.addDoc(invites[i], "todoapp");
+                    setState(() => invites.removeAt(i));
+                  },
+                ),
+                TextButton(
+                  child: const Text('DISMISS'),
+                  onPressed: () {
+                    setState(() => invites.removeAt(i));
+                  },
+                ),
+              ],
+            ));
+          }
+          return Column(
+            children: children,
+            mainAxisSize: MainAxisSize.min,
+          );
+        });
+  }
+}
+
+class PeerTile extends StatelessWidget {
+  const PeerTile({
+    Key? key,
+    required this.id,
+    required this.isConnected,
+    required this.isLocal,
+    required this.permission,
+    this.onTap,
+  }) : super(key: key);
+
+  final String id;
+  final bool isConnected;
+  final bool isLocal;
+  final int permission;
+  final Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = [
+      Icon(isConnected ? Icons.link : Icons.link_off),
+      Icon(isLocal ? Icons.wifi : Icons.network_cell),
+      Icon(permission > 0 ? Icons.visibility : Icons.visibility_off),
+      Icon(permission > 1 ? Icons.edit : Icons.edit_off),
+    ];
+    if (permission > 2) {
+      icons.add(const Icon(Icons.share));
+    }
+    return Card(
+      child: ListTile(
+        title: Text(id),
+        trailing: Row(
+          children: icons,
+          mainAxisSize: MainAxisSize.min,
+        ),
+        onTap: onTap,
       ),
     );
   }

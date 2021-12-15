@@ -117,6 +117,14 @@ class Todos {
   void remove(int index) {
     get(index).delete();
   }
+
+  void addPeer(String peer) {
+    final cursor = doc.createCursor();
+    final causal = cursor.sayCan(peer, 1 /*Write permission*/);
+    doc.applyCausal(causal);
+    cursor.drop();
+    doc.invitePeer(peer);
+  }
 }
 
 class LocalPeers {
@@ -129,6 +137,27 @@ class LocalPeers {
     yield (await sdk.localPeers()).toList();
     await for (final _ in sub) {
       yield (await sdk.localPeers()).toList();
+    }
+  }
+}
+
+class Invites {
+  final tlfs.Sdk sdk;
+
+  Invites(this.sdk);
+
+  Stream<List<String>> subscribeInvites() async* {
+    final sub = sdk.subscribeInvites();
+    await for (final _ in sub) {
+      final iter = await sdk.invites();
+      final List<String> invites = [];
+      for (final invite in iter) {
+        if (invite[1] != "todoapp") {
+          continue;
+        }
+        invites.add(invite[0]);
+      }
+      yield invites;
     }
   }
 }
