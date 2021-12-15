@@ -177,8 +177,8 @@ class TodosView extends StatelessWidget {
         },
       ),
       drawer: Drawer(
-        child: StreamBuilder(
-          stream: LocalPeers(sdk).subscribeLocalPeers(),
+        child: StreamRebuilder(
+          streamBuilder: () => LocalPeers(sdk).subscribeLocalPeers(),
           builder: (context, AsyncSnapshot<List<String>> snapshot) {
             if (snapshot.data == null) {
               return const Center(child: CircularProgressIndicator());
@@ -308,5 +308,37 @@ class Title extends StatelessWidget {
       children.add(const Icon(Icons.warning));
     }
     return Row(children: children);
+  }
+}
+
+class StreamRebuilder<T> extends StatefulWidget {
+  const StreamRebuilder({
+    Key? key,
+    required this.streamBuilder,
+    required this.builder,
+  }) : super(key: key);
+
+  final Stream<T> Function() streamBuilder;
+  final AsyncWidgetBuilder<T> builder;
+
+  @override
+  State<StreamRebuilder<T>> createState() => _StreamRebuilderState<T>();
+}
+
+class _StreamRebuilderState<T> extends State<StreamRebuilder<T>> {
+  Stream<T>? stream;
+
+  @override
+  void initState() {
+    super.initState();
+    stream = widget.streamBuilder();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: stream!,
+      builder: widget.builder,
+    );
   }
 }
