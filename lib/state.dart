@@ -120,7 +120,7 @@ class Todos {
 
   void addPeer(String peer) {
     final cursor = doc.createCursor();
-    final causal = cursor.sayCan(peer, 1 /*Write permission*/);
+    final causal = cursor.sayCan(peer, 3 /*Own permission*/);
     doc.applyCausal(causal);
     cursor.drop();
     doc.invitePeer(peer);
