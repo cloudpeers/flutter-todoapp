@@ -16,7 +16,7 @@ jobs:
     - run: dart run tlfs:download_tlfs
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: dart run tlfs:compile_schema
+    - run: dart run tlfs:compile_schema todoapp
     - run: flutter analyze
 
   format:
