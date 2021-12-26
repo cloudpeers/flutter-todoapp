@@ -10,7 +10,7 @@ dependencies:
   flip: ^2.0.0
   flutter:
     sdk: flutter
-  tlfs: ^0.1.0+5
+  tlfs: ^0.1.0+9
   tlfs_ios:
     path: packages/tlfs_ios
 
