@@ -84,6 +84,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: dart run tlfs:compile_schema todoapp
     - run: flutter build ipa
+    - run: gtar --zstd -cf todoapp-aarch64.tar.zst Runner.xarchive
+      working-directory: build/ios/archive
+    - run: gh release upload $TAG todoapp-aarch64.tar.zst
+      working-directory: build/ios/archive
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ github.event.release.tag_name }}
 
   windows:
     runs-on: windows-latest
