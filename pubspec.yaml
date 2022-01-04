@@ -8,7 +8,13 @@ environment:
 
 dependencies:
   flip: ^2.0.0
+  fluent:
+    git:
+      url: https://github.com/dvc94ch/fluent-dart
+      ref: update-intl
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
   tlfs: ^0.1.0+9
 
@@ -22,3 +28,5 @@ flutter:
   uses-material-design: true
   assets:
   - assets/todoapp.tlfs.rkyv
+  - assets/i18n/en.ftl
+  - assets/i18n/de.ftl

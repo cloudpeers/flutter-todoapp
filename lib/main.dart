@@ -1,31 +1,47 @@
 import 'package:flip/flip.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:tlfs/sdk.dart';
 import 'package:tlfs/tlfs.dart' as tlfs;
+import './localization.dart';
 import './state.dart';
+
+const List<Locale> SUPPORTED_LOCALES = [
+  const Locale('en'),
+  const Locale('de'),
+  //const Locale('pt'),
+];
 
 void main() {
   runApp(
     Sdk(
       appname: 'todoapp',
       child: MaterialApp(
-          initialRoute: '/docs',
-          onGenerateRoute: (settings) {
-            switch (settings.name) {
-              case '/docs':
-                return MaterialPageRoute(builder: (context) {
-                  final sdk = Sdk.of(context).sdk;
-                  return DocsView(sdk: sdk, schema: "todoapp");
-                });
-              case '/todos':
-                final todos = settings.arguments! as Todos;
-                return MaterialPageRoute(builder: (context) {
-                  return TodosView(todos: todos);
-                });
-              default:
-                return null;
-            }
-          }),
+        initialRoute: '/docs',
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/docs':
+              return MaterialPageRoute(builder: (context) {
+                final sdk = Sdk.of(context).sdk;
+                return DocsView(sdk: sdk, schema: "todoapp");
+              });
+            case '/todos':
+              final todos = settings.arguments! as Todos;
+              return MaterialPageRoute(builder: (context) {
+                return TodosView(todos: todos);
+              });
+            default:
+              return null;
+          }
+        },
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          FluentLocalizationsDelegate(SUPPORTED_LOCALES),
+        ],
+        supportedLocales: SUPPORTED_LOCALES,
+        onGenerateTitle: (BuildContext context) => i18n(context, 'title-app'),
+      ),
     ),
   );
 }
@@ -43,7 +59,7 @@ class DocsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Documents')),
+      appBar: AppBar(title: Text(i18n(context, 'title-docs'))),
       body: Column(children: [
         const InviteBanner(),
         Expanded(
@@ -69,7 +85,7 @@ class DocsView extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () async {
           final doc = await sdk.createDoc(schema);
-          Todos(doc).setTitle('a new document');
+          Todos(doc).setTitle(i18n(context, 'new-document-title'));
         },
       ),
     );
@@ -139,8 +155,8 @@ class _DocTileState extends State<DocTile> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0)
                     .add(const EdgeInsets.only(bottom: 3.0)),
                 child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
+                    decoration: InputDecoration(
+                      labelText: i18n(context, 'label-doc-title'),
                     ),
                     controller: _titleController,
                     onSubmitted: (String value) {
@@ -156,8 +172,9 @@ class _DocTileState extends State<DocTile> {
           final sdk = Sdk.of(context).sdk;
           final title = widget.todos.title()[0];
           sdk.removeDoc(widget.todos.id());
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('removed document `$title`')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(i18n(
+                  context, 'snackbar-removed-document', {'title': title}))));
         });
   }
 }
@@ -220,7 +237,7 @@ class TodosView extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          todos.create('a new todo');
+          todos.create(i18n(context, 'new-todo-title'));
         },
       ),
     );
@@ -250,19 +267,19 @@ class _InviteBannerState extends State<InviteBanner> {
           for (int i = 0; i < invites.length; i++) {
             children.add(MaterialBanner(
               padding: const EdgeInsets.all(20),
-              content: Text(
-                  'received an invitation to collaborate on ${invites[i]}'),
+              content: Text(i18n(
+                  context, 'invite-banner-content', {'invite': invites[i]})),
               backgroundColor: const Color(0xFFE0E0E0),
               actions: [
                 TextButton(
-                  child: const Text('ACCEPT'),
+                  child: Text(i18n(context, 'invite-banner-accept')),
                   onPressed: () {
                     sdk.addDoc(invites[i], "todoapp");
                     setState(() => invites.removeAt(i));
                   },
                 ),
                 TextButton(
-                  child: const Text('DISMISS'),
+                  child: Text(i18n(context, 'invite-banner-dismiss')),
                   onPressed: () {
                     setState(() => invites.removeAt(i));
                   },
@@ -381,8 +398,8 @@ class _TodoTileState extends State<TodoTile> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0)
                     .add(const EdgeInsets.only(bottom: 3.0)),
                 child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
+                    decoration: InputDecoration(
+                      labelText: i18n(context, 'label-todo-title'),
                     ),
                     controller: _titleController,
                     onSubmitted: (String value) {
@@ -397,8 +414,9 @@ class _TodoTileState extends State<TodoTile> {
         onDismissed: (direction) {
           final title = widget.todo.title()[0];
           widget.todo.delete();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('removed todo `$title`')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  i18n(context, 'snackbar-remove-todo', {'title': title}))));
         });
   }
 }
