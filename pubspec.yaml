@@ -16,12 +16,16 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  tlfs: ^0.1.0+9
+  #tlfs: ^0.1.0+9
+  tlfs:
+    path: ../tlfs/api/dart
 
 dev_dependencies:
+  flutter_lints: ^1.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  integration_test:
+    sdk: flutter
   msix: ^2.6.7
 
 flutter:
@@ -30,3 +34,12 @@ flutter:
   - assets/todoapp.tlfs.rkyv
   - assets/i18n/en.ftl
   - assets/i18n/de.ftl
+
+msix_config:
+  display_name: todoapp
+  logo_path: assets/icon.png
+  capabilities: "privateNetworkClientServer,internetClientServer"
+  publisher_display_name: cloudpeer
+  identity_name: 29833cloudpeer.com.cloudpeer.todoapp
+  msix_version: 1.0.0.0
+  publisher: CN=1EE69DF2-74E3-4146-A9E5-DA6088B1FBDA

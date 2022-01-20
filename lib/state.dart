@@ -61,6 +61,17 @@ class Todos {
 
   Todos(this.doc);
 
+  static Future<Todos> createList(tlfs.Sdk sdk, String title) async {
+    final doc = await sdk.createDoc('todoapp');
+    final todos = Todos(doc);
+    todos.setTitle(title);
+    return todos;
+  }
+
+  static Todos openList(tlfs.Sdk sdk, String docId) {
+    return Todos(sdk.openDoc(docId));
+  }
+
   String id() {
     return doc.id().toString();
   }

@@ -5,6 +5,7 @@ import 'package:tlfs/sdk.dart';
 import 'package:tlfs/tlfs.dart' as tlfs;
 import './localization.dart';
 import './state.dart';
+import './theme.dart';
 
 const List<Locale> SUPPORTED_LOCALES = [
   const Locale('en'),
@@ -13,9 +14,17 @@ const List<Locale> SUPPORTED_LOCALES = [
 ];
 
 void main() {
+  appMain();
+}
+
+void appMain({
+  bool persistent = true,
+  bool debugShowCheckedModeBanner = true,
+}) {
   runApp(
     Sdk(
       appname: 'todoapp',
+      persistent: persistent,
       child: MaterialApp(
         initialRoute: '/docs',
         onGenerateRoute: (settings) {
@@ -34,6 +43,7 @@ void main() {
               return null;
           }
         },
+        theme: APP_THEME,
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -41,6 +51,7 @@ void main() {
         ],
         supportedLocales: SUPPORTED_LOCALES,
         onGenerateTitle: (BuildContext context) => i18n(context, 'title-app'),
+        debugShowCheckedModeBanner: debugShowCheckedModeBanner,
       ),
     ),
   );
@@ -70,7 +81,7 @@ class DocsView extends StatelessWidget {
               return ListView.builder(
                 itemCount: docs.length,
                 itemBuilder: (context, i) {
-                  final todos = Todos(sdk.openDoc(docs[i]));
+                  final todos = Todos.openList(sdk, docs[i]);
                   return StreamBuilder(
                     stream: todos.subscribeTitle(),
                     builder: (context, snapshot) => DocTile(todos: todos),
@@ -84,8 +95,7 @@ class DocsView extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
-          final doc = await sdk.createDoc(schema);
-          Todos(doc).setTitle(i18n(context, 'new-document-title'));
+          await Todos.createList(sdk, i18n(context, 'new-document-title'));
         },
       ),
     );
