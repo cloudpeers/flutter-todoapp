@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="feature.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     showborder="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:zoom="0.88769522"
+     inkscape:cx="-266.98353"
+     inkscape:cy="357.66781"
+     inkscape:window-width="1916"
+     inkscape:window-height="1166"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient52158">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop52154" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0.06138874"
+         offset="1"
+         id="stop52156" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient50570">
+      <stop
+         style="stop-color:#bebebe;stop-opacity:1"
+         offset="0"
+         id="stop50566" />
+      <stop
+         style="stop-color:#6e6e6e;stop-opacity:1"
+         offset="1"
+         id="stop50568" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient45926">
+      <stop
+         style="stop-color:#8e8fc1;stop-opacity:1"
+         offset="0"
+         id="stop45922" />
+      <stop
+         style="stop-color:#262746;stop-opacity:1"
+         offset="1"
+         id="stop45924" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient45926"
+       id="linearGradient45928"
+       x1="-88.911003"
+       y1="26.328609"
+       x2="46.555656"
+       y2="161.79527"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2.0000001,0,0,0.97656255,-25.195281,10.895296)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient50570"
+       id="linearGradient50572"
+       x1="-56.405354"
+       y1="51.735294"
+       x2="16.630341"
+       y2="135.91374"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.1858446,0,0,1.1858446,-111.74946,-7.027925)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient52158"
+       id="linearGradient52160"
+       x1="-466.772"
+       y1="99.509705"
+       x2="42.094963"
+       y2="585.23029"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.26458333,0,-0.00115088,0.26458333,-79.057925,10.278221)" />
+    <inkscape:path-effect
+       effect="fill_between_many"
+       method="originald"
+       linkedpaths="#path50137,0,1"
+       id="path-effect52808" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient50570"
+       id="linearGradient63613"
+       x1="-63.229958"
+       y1="76.186752"
+       x2="14.081031"
+       y2="76.186752"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(2.2004534,0,0,2.2004533,38.179276,-83.927677)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       d="M 0,0"
+       id="path52810"
+       inkscape:original-d="M 0,0"
+       inkscape:path-effect="#path-effect52808" />
+    <g
+       id="g75724"
+       inkscape:export-filename="/home/dvc/cloudpeer/flutter-todoapp/feature.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96">
+      <rect
+         style="fill:url(#linearGradient45928);fill-opacity:1;fill-rule:evenodd;stroke-width:0.218679"
+         id="rect31"
+         width="270.93332"
+         height="132.29167"
+         x="-203.01729"
+         y="36.606831" />
+      <path
+         id="path51335"
+         style="fill:url(#linearGradient52160);fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m -93.759668,59.654019 -37.986212,38.352179 -15.69262,32.081762 -23.1504,-23.07301 0.71976,14.51178 12.41819,32.11742 17.70471,15.3312 150.810485,-0.70206 -78.485299,-82.16559 z"
+         sodipodi:nodetypes="cccccccccc" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:140.461px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;fill:url(#linearGradient50572);fill-opacity:1;stroke:none;stroke-width:3.51152"
+         x="-177.70316"
+         y="150.97318"
+         id="text5113"><tspan
+           sodipodi:role="line"
+           id="tspan5111"
+           style="fill:url(#linearGradient50572);fill-opacity:1;stroke-width:3.51152"
+           x="-177.70316"
+           y="150.97318">✓</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:23.288px;line-height:1.25;font-family:sans-serif;fill:url(#linearGradient63613);fill-opacity:1;stroke:none;stroke-width:0.582202"
+         x="-102.23614"
+         y="89.772598"
+         id="text58461"
+         transform="scale(0.8950228,1.11729)"><tspan
+           sodipodi:role="line"
+           style="fill:url(#linearGradient63613);fill-opacity:1;stroke-width:0.582202"
+           x="-102.23614"
+           y="89.772598"
+           id="tspan65659">less planning</tspan><tspan
+           sodipodi:role="line"
+           style="fill:url(#linearGradient63613);fill-opacity:1;stroke-width:0.582202"
+           x="-102.23614"
+           y="118.88261"
+           id="tspan65663">more doing</tspan></text>
+    </g>
+  </g>
+</svg>
